@@ -10,3 +10,12 @@
 * On Sinterklaas/Saint Nicholas/Moș Nicolae, Kerstmis/Christmas/Crăciun and
 Oudejaarsavond/New Year's eve/Ajunul Anului Nou tags will be created. This will
 simply mark the progress at that point in time.
+
+
+## DAY1
+- So far I am waiting for the problem to be published. To my suprise, the origin
+of the website is located at UTC-5 which makes it 6h behind my current NL time.
+I guess I am waking up early. You know ... "Rise and shine, Mr. Freeman ... rise
+and shine" ... "early bird catches the worm" ... so on and so forth.
+
+-
