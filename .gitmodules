@@ -1,0 +1,3 @@
+[submodule "generic-Makefile"]
+	path = generic-Makefile
+	url = https://github.com/TrainzC99/generic-Makefile.git
