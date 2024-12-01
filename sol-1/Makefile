@@ -1,5 +1,5 @@
 .SUFFIXES: .o .c
-.PHONY: all options prog valmem dist clean graph
+.PHONY: all options prog run valmem dist clean graph
 
 UNAME		:= $(shell uname)
 
@@ -47,7 +47,8 @@ $(TESTPROG): $(filter-out $(MAIN).o, $(TESTFOBJ))
 .c.o:
 	$(CC) $(CFLAGS) -c $<
 prog: options $(PROGRAM)
-	./$(PROGRAM)
+run: options $(PROGRAM)
+	./$(PROGRAM) < $(INFILE)
 check: options $(TESTPROG)
 	./$(TESTPROG)
 script: $(PROGRAM) #$(TESTPROG)
