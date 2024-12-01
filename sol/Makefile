@@ -9,11 +9,11 @@ else
 COMPILER	:= gcc
 endif
 
-PROGRAM    	= program
+PROGRAM    	= day1
 TESTPROG   	= test-$(PROGRAM)
-VERSION    	= 0.0.0.0
+VERSION    	= 0.0.0.1
 AUTSCRIPT	= automation	# name of automation scrip if present
-MAIN		= main			# name of main file if different
+MAIN		= d1aoc			# name of main file if different
 SRC        	= $(wildcard *.c)
 OBJ        	= $(SRC:.c=.o)
 OUTFILES	= $(wildcard *.out)
