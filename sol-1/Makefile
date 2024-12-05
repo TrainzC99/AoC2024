@@ -1,5 +1,5 @@
 .SUFFIXES: .o .c
-.PHONY: all options prog valmem dist clean graph
+.PHONY: all options runpf runaf prog valmempf valmemaf dist clean graph
 
 UNAME		:= $(shell uname)
 
@@ -47,13 +47,17 @@ $(TESTPROG): $(filter-out $(MAIN).o, $(TESTFOBJ))
 .c.o:
 	$(CC) $(CFLAGS) -c $<
 prog: options $(PROGRAM)
-run: options $(PROGRAM)
+runpf: options $(PROGRAM) # run with piped file
 	./$(PROGRAM) < $(INFILE)
+runaf: options $(PROGRAM) # runf = run with argument file
+	./$(PROGRAM) $(INFILE)
 check: options $(TESTPROG)
 	./$(TESTPROG)
 script: $(PROGRAM) #$(TESTPROG)
 	./$(AUTSCRIPT).sh
-valmem: options $(PROGRAM)
+valmempf: options $(PROGRAM)
+	valgrind $(VALFLAGS) ./$(PROGRAM) < $(INFILE)
+valmemaf: options $(PROGRAM)
 	valgrind $(VALFLAGS) ./$(PROGRAM) < $(INFILE)
 dist: clean
 	mkdir -p -- "$(PROGRAM)-$(VERSION)"
