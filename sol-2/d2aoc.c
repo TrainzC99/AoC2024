@@ -55,8 +55,9 @@ int main (int argc, const char* argv[])
 
 bool safe_report(int num[], int n)
 {
-	int i;
+	int i, j;
 	int delta;
+	int auxNum[MAX_REPORT_LENGTH];
 	prog level, lastLevel;
 
 	level = (num[0] > num[1]) ? DECREASING : \
@@ -69,11 +70,23 @@ bool safe_report(int num[], int n)
 				(num[i - 1] < num[i]) ? INCREASING : \
 				level;
 		if(lastLevel != level)
-			return FALSE;
+		{
+			(void) memcpy(auxNum, num, MAX_REPORT_LENGTH);
+			for(j = i - 1; i < n - 1; i ++)
+				auxNum[j] = auxNum[j + 1];
+			if(safe_report(auxNum, n - 1) == FALSE)
+				return FALSE;
+		}
 
 		delta = ABS(num[i - 1] - num[i]);
 		if(delta < 1 || delta > 3)
-			return FALSE;
+		{
+			(void) memcpy(auxNum, num, MAX_REPORT_LENGTH);
+			for(j = i - 1; i < n - 1; i ++)
+				auxNum[j] = auxNum[j + 1];
+			if(safe_report(auxNum, n - 1) == FALSE)
+				return FALSE;
+		}
 
 		lastLevel = level;
 	}
