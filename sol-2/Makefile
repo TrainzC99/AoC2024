@@ -9,7 +9,7 @@ else
 COMPILER	:= gcc
 endif
 
-PROGRAM    	= day2-1
+PROGRAM    	= day2-2
 TESTPROG   	= test-$(PROGRAM)
 VERSION    	= 0.0.0.0
 AUTSCRIPT	= automation	# name of automation scrip if present
