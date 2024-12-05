@@ -1,17 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "d2aoc.h"
 
 #define BUFF_512B 512
+#define MAX_REPORT_LENGTH 8
 #define ABS(X) ((X) < 0 ? -(X) : (X))
 
 int main (int argc, const char* argv[])
 {
 	FILE *inFile;
-	char line[BUFF_512B], *no;
-	int a, b, c;
-	int delta;
-	int safeCount, safeReportCount, countPairs;
+	char line[BUFF_512B], *strno;
+	int no;
+	int R[MAX_REPORT_LENGTH], RCount;
+	int safeReportCount;
 
 	// Check for enough args were provided
 	if (argc < 2)
@@ -32,48 +34,50 @@ int main (int argc, const char* argv[])
 	(void) printf("File name is -> %s\n", argv[1]);
 
 	// Read and process file line by line
-	safeCount = 0;
+	RCount = 0;
 	safeReportCount = 0;
-	countPairs = 0;
 	while(fgets(line, BUFF_512B, inFile) != NULL)
 	{
 		(void) printf("%s", line);
-		no = strtok(line, " \n");
-		a = atoi(no);
-		no = strtok(NULL, " \n");
-		b = atoi(no);
-		no = strtok(NULL, " \n");
-		while(no != NULL && countPairs == safeCount)
-		{
-			c = atoi(no);
-			(void) printf("%d %d %d\n", a, b, c);
-
-			delta = ABS(b - a);
-			if(!(delta < 1 || delta > 3)) // delta >= 1 && delta <= 3
-				safeCount++;
-			else
-				safeCount = 0;
-
-			if((a > b && b > c) || (a < b && b < c))
-				countPairs++;
-			else
-				countPairs = 0;
-
-			a = b;
-			b = c;
-			no = strtok(NULL, " \n");
-		}
-		if(safeCount != 0  && safeCount == countPairs)
-		{
-			safeReportCount++;
-			printf("after while %d %d\n", safeCount, countPairs);
-		}
-		safeCount = 0;
-		countPairs = 0;
+		strno = strtok(line, " \n");
+		do{
+			no = atoi(strno);
+			R[RCount++] = no;
+		}while((strno = strtok(NULL, " \n")));
+		safeReportCount = (safe_report(R, RCount) == TRUE) ? \
+						  safeReportCount + 1 : safeReportCount;
+		RCount = 0;
 	}
 
 	(void) printf("Number of safe reports -> %d\n", safeReportCount);
-
 	return EXIT_SUCCESS;
+}
+
+bool safe_report(int num[], int n)
+{
+	int i;
+	int delta;
+	prog level, lastLevel;
+
+	level = (num[0] > num[1]) ? DECREASING : \
+			(num[0] < num[1]) ? INCREASING : \
+			level;
+	lastLevel = level;
+	for(i = 1; i < n; i ++)
+	{
+		level = (num[i - 1] > num[i]) ? DECREASING : \
+				(num[i - 1] < num[i]) ? INCREASING : \
+				level;
+		if(lastLevel != level)
+			return FALSE;
+
+		delta = ABS(num[i - 1] - num[i]);
+		if(delta < 1 || delta > 3)
+			return FALSE;
+
+		lastLevel = level;
+	}
+
+	return TRUE;
 }
 

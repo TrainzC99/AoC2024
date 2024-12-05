@@ -2,10 +2,16 @@
 
 // ---> ENUMERATIONS <--- // // §- Declarations -§ //
 /*----------------------------------------------*/
-enum bool{
+enum boolean{
 	TRUE,
 	FALSE
-}
+};
+typedef enum boolean bool;
+enum progression{
+	INCREASING,
+	DECREASING
+};
+typedef enum progression prog;
 /*----------------------------------------------*/
 
 // ---> FUNCTIONS <--- // // §- Declarations -§ //
