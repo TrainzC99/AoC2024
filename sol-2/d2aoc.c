@@ -11,9 +11,11 @@ int main (int argc, const char* argv[])
 {
 	FILE *inFile;
 	char line[BUFF_512B], *strno;
-	int no;
-	int R[MAX_REPORT_LENGTH], RCount;
-	int safeReportCount;
+	int R[MAX_REPORT_LENGTH], auxNum[MAX_REPORT_LENGTH], RCount;
+	int safeReportCount, no;
+	int i, j;
+	bool safe;
+	result arrayReport, subArrayReport;
 
 	// Check for enough args were provided
 	if (argc < 2)
@@ -34,6 +36,7 @@ int main (int argc, const char* argv[])
 	(void) printf("File name is -> %s\n", argv[1]);
 
 	// Read and process file line by line
+	safe = FALSE;
 	RCount = 0;
 	safeReportCount = 0;
 	while(fgets(line, BUFF_512B, inFile) != NULL)
@@ -44,22 +47,44 @@ int main (int argc, const char* argv[])
 			no = atoi(strno);
 			R[RCount++] = no;
 		}while((strno = strtok(NULL, " \n")));
-		safeReportCount = (safe_report(R, RCount) == TRUE) ? \
-						  safeReportCount + 1 : safeReportCount;
+
+		arrayReport = safe_report(R, RCount);
+		if(arrayReport.safe == FALSE)
+		{
+			for(i = arrayReport.failIndex; (i < RCount) && (!safe); i++)
+			{
+				(void) memcpy(auxNum, R, sizeof(auxNum[0]) * RCount);
+				for(j = i; j < RCount - 1; j ++)
+					auxNum[j] = auxNum[j + 1];
+				printf("auxNum -> \n\t");
+				for(j = 0; j < RCount - 1; j ++)
+					printf("%d ", auxNum[j]);
+				printf("\n");
+				subArrayReport = safe_report(auxNum, RCount - 1);
+				if(subArrayReport.safe)
+					safe = TRUE;
+			}
+		}
+
+		if(arrayReport.safe || safe)
+			safeReportCount++;
+
+		safe = !safe;
 		RCount = 0;
 	}
 
-	(void) printf("Number of safe reports -> %d\n", safeReportCount);
+	(void) printf("\nNumber of safe reports -> %d\n", safeReportCount);
 	return EXIT_SUCCESS;
 }
 
-bool safe_report(int num[], int n)
+result safe_report(int num[], int n)
 {
-	int i, j;
+	int i;
 	int delta;
-	int auxNum[MAX_REPORT_LENGTH];
 	prog level, lastLevel;
+	result report;
 
+	report.safe = FALSE;
 	level = (num[0] > num[1]) ? DECREASING : \
 			(num[0] < num[1]) ? INCREASING : \
 			level;
@@ -69,28 +94,16 @@ bool safe_report(int num[], int n)
 		level = (num[i - 1] > num[i]) ? DECREASING : \
 				(num[i - 1] < num[i]) ? INCREASING : \
 				level;
-		if(lastLevel != level)
-		{
-			(void) memcpy(auxNum, num, MAX_REPORT_LENGTH);
-			for(j = i - 1; i < n - 1; i ++)
-				auxNum[j] = auxNum[j + 1];
-			if(safe_report(auxNum, n - 1) == FALSE)
-				return FALSE;
-		}
-
 		delta = ABS(num[i - 1] - num[i]);
-		if(delta < 1 || delta > 3)
+		if((lastLevel != level) || (delta < 1 || delta > 3))
 		{
-			(void) memcpy(auxNum, num, MAX_REPORT_LENGTH);
-			for(j = i - 1; i < n - 1; i ++)
-				auxNum[j] = auxNum[j + 1];
-			if(safe_report(auxNum, n - 1) == FALSE)
-				return FALSE;
+			report.failIndex = i - 1;
+			return report;
 		}
-
 		lastLevel = level;
 	}
-
-	return TRUE;
+	report.safe = TRUE;
+	report.failIndex = -1;
+	return report;
 }
 
