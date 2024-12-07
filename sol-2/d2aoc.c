@@ -15,7 +15,6 @@ int main (int argc, const char* argv[])
 	int safeReportCount, no;
 	int i, j;
 	bool safe;
-	result arrayReport, subArrayReport;
 
 	// Check for enough args were provided
 	if (argc < 2)
@@ -41,6 +40,7 @@ int main (int argc, const char* argv[])
 	safeReportCount = 0;
 	while(fgets(line, BUFF_512B, inFile) != NULL)
 	{
+		//Parse line into numerical array
 		(void) printf("%s", line);
 		strno = strtok(line, " \n");
 		do{
@@ -48,28 +48,31 @@ int main (int argc, const char* argv[])
 			R[RCount++] = no;
 		}while((strno = strtok(NULL, " \n")));
 
-		arrayReport = safe_report(R, RCount);
-		if(arrayReport.safe == FALSE)
+		// Check if line is safe
+		if(safe_report(R, RCount) == FALSE)
 		{
-			for(i = arrayReport.failIndex; (i < RCount) && (!safe); i++)
+			// Take out one number at once
+			for(i = 0; (i < RCount) && (!safe); i++)
 			{
+				// Remove said number
 				(void) memcpy(auxNum, R, sizeof(auxNum[0]) * RCount);
 				for(j = i; j < RCount - 1; j ++)
 					auxNum[j] = auxNum[j + 1];
-				printf("auxNum -> \n\t");
-				for(j = 0; j < RCount - 1; j ++)
-					printf("%d ", auxNum[j]);
-				printf("\n");
-				subArrayReport = safe_report(auxNum, RCount - 1);
-				if(subArrayReport.safe)
+
+				// Assert safety
+				if(safe_report(auxNum, RCount - 1))
 					safe = TRUE;
 			}
+
+			// Assert if line short of one element is safe
+			safeReportCount = safe ? safeReportCount + 1 : safeReportCount;
+		}
+		else
+		{
+			safeReportCount++;
 		}
 
-		if(arrayReport.safe || safe)
-			safeReportCount++;
-
-		safe = !safe;
+		safe = FALSE;
 		RCount = 0;
 	}
 
@@ -77,33 +80,32 @@ int main (int argc, const char* argv[])
 	return EXIT_SUCCESS;
 }
 
-result safe_report(int num[], int n)
+bool safe_report(int num[], int n)
 {
 	int i;
 	int delta;
 	prog level, lastLevel;
-	result report;
 
-	report.safe = FALSE;
 	level = (num[0] > num[1]) ? DECREASING : \
 			(num[0] < num[1]) ? INCREASING : \
 			level;
 	lastLevel = level;
 	for(i = 1; i < n; i ++)
 	{
+		// Check progression between two elements
 		level = (num[i - 1] > num[i]) ? DECREASING : \
 				(num[i - 1] < num[i]) ? INCREASING : \
 				level;
+		// Calculate the difference between two elements
 		delta = ABS(num[i - 1] - num[i]);
+
+		// Assert that the progression has not changed
+		// and that the difference is out of range [1, 3]
 		if((lastLevel != level) || (delta < 1 || delta > 3))
-		{
-			report.failIndex = i - 1;
-			return report;
-		}
+			return FALSE;
+
 		lastLevel = level;
 	}
-	report.safe = TRUE;
-	report.failIndex = -1;
-	return report;
+	return TRUE;
 }
 
