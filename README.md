@@ -10,3 +10,5 @@
 * On Sinterklaas/Saint Nicholas/Moș Nicolae, Kerstmis/Christmas/Crăciun and
 Oudejaarsavond/New Year's eve/Ajunul Anului Nou tags will be created. This will
 simply mark the progress at that point in time.
+
+## DAY 3
