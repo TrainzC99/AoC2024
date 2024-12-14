@@ -12,7 +12,7 @@ int main (int argc, const char* argv[])
 {
 	FILE *inFile;
 	unsigned long long fileSize;
-	char *fileText;
+	char *fileText, *fileTextBegin;
 	regex_t matchex;
 	regmatch_t matches[MAX_MATCH];
 
@@ -33,6 +33,13 @@ int main (int argc, const char* argv[])
 
 	// Read and store file in memory
 	fileText = malloc(sizeof(*fileText) * fileSize);
+	if(fileText == NULL)
+	{
+		(void) fprintf(stderr, "Error while allocating memory!\n");
+		fclose(inFile);
+		exit(EXIT_FAILURE);
+	}
+	fileTextBegin = fileText;
 	(void) fgets(fileText, fileSize, inFile);
 
 	// Display read contents
@@ -50,18 +57,33 @@ int main (int argc, const char* argv[])
 
 	// Match regex patter on input text
 	while((regexec(&matchex, fileText, MAX_MATCH, matches, 0) == 0) \
-			|| (*fileText == '\0'))
+			&& (*fileText != '\0'))
 	{
-		(void) printf("Match\n");
 		(void) printf("Match found:\n %.*s\n", \
 				matches[0].rm_eo - matches[0].rm_so, \
 				fileText + matches[0].rm_so);
 
+		// Get lenght of match
+		// Get string of match
+		// Parse string
+			// Look for numbers
+			// Extract digits and turn them into numbers
+			// Multiply numbers
+		// Add multiplications together
+
+		// Move past the match
 		fileText = fileText + matches[0].rm_eo;
+
+		// In case of 0-length matches, avoiding infinite loop
+		if(matches[0].rm_eo == matches[0].rm_so)
+			fileText++;
 	}
-	// Free file from memory
-	free(fileText);
+
+	// Free file and regex from memory
+	free(fileTextBegin);
+	fclose(inFile);
 	regfree(&matchex);
+
 
 	return EXIT_SUCCESS;
 }
