@@ -10,11 +10,18 @@
 
 int main (int argc, const char* argv[])
 {
+	/* File variables */
 	FILE *inFile;
 	unsigned long long fileSize;
 	char *fileText, *fileTextBegin;
+	int pLength;
+
+	/* Match and related variables */
 	regex_t matchex;
 	regmatch_t matches[MAX_MATCH];
+	//int mLength;
+	char *mStr, *pChrNum;
+	const char *nums = "0123456789";
 
 	// Check for enough args were provided
 	if (argc < 2)
@@ -63,10 +70,16 @@ int main (int argc, const char* argv[])
 				matches[0].rm_eo - matches[0].rm_so, \
 				fileText + matches[0].rm_so);
 
-		// Get lenght of match
 		// Get string of match
+		mStr = fileText + matches[0].rm_so;
 		// Parse string
 			// Look for numbers
+			// pChrNum & pLength get the whole number
+			pChrNum = strpbrk(mStr, nums);
+			printf("%c\n", *pChrNum);
+			pLength = strspn(pChrNum, nums);
+			printf("pl %d\n", pLength);
+			printf("%.*s\n", pLength, pChrNum);
 			// Extract digits and turn them into numbers
 			// Multiply numbers
 		// Add multiplications together
