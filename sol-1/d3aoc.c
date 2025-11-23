@@ -75,12 +75,21 @@ int main (int argc, const char* argv[])
 		// Parse string
 			// Look for numbers
 			// pChrNum & pLength get the whole number
+			// Extract digits and turn them into numbers
+			// First number
 			pChrNum = strpbrk(mStr, nums);
 			printf("%c\n", *pChrNum);
 			pLength = strspn(pChrNum, nums);
 			printf("pl %d\n", pLength);
 			printf("%.*s\n", pLength, pChrNum);
-			// Extract digits and turn them into numbers
+
+			// Second number
+			pChrNum = pChrNum + 2;
+			pChrNum = strpbrk(pChrNum, nums);
+			printf("%c\n", *pChrNum);
+			pLength = strspn(pChrNum, nums);
+			printf("pl %d\n", pLength);
+			printf("%.*s\n", pLength, pChrNum);
 			// Multiply numbers
 		// Add multiplications together
 
