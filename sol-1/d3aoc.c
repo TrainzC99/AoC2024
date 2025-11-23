@@ -19,9 +19,13 @@ int main (int argc, const char* argv[])
 	/* Match and related variables */
 	regex_t matchex;
 	regmatch_t matches[MAX_MATCH];
-	//int mLength;
 	char *mStr, *pChrNum;
 	const char *nums = "0123456789";
+	int mCount;
+
+	/*Math operations variables*/
+	int no1, no2;
+	unsigned long long sum;
 
 	// Check for enough args were provided
 	if (argc < 2)
@@ -34,9 +38,13 @@ int main (int argc, const char* argv[])
 	inFile = fopen(argv[1], "rb");
 	checkFileOpen(inFile);
 	fileSize = getFileSize(inFile);
+	// This returns +1 as ftell returns the current value of the pos. indicator
+	// which inturn itself points to the next character to be read or 
+	// written in the next I/O operation.
 
 	// File details
-	(void) printf("File name is -> %s\n", argv[1]);
+	(void) printf("File name -> %s\n", argv[1]);
+	(void) printf("File size -> %llu\n", fileSize);
 
 	// Read and store file in memory
 	fileText = malloc(sizeof(*fileText) * fileSize);
@@ -47,11 +55,18 @@ int main (int argc, const char* argv[])
 		exit(EXIT_FAILURE);
 	}
 	fileTextBegin = fileText;
-	(void) fgets(fileText, fileSize, inFile);
-
+	if(fread(fileText, sizeof(*fileText), fileSize, inFile) != fileSize)
+	{
+		(void) fprintf(stderr, "Error file not read correctly!\n");
+		fclose(inFile);
+		free(fileText);
+		exit(EXIT_FAILURE);
+	}
+	fileText[fileSize] = '\0';
+	
 	// Display read contents
-	(void) printf("Read contents:\n");
-	(void) printf("%s\n", fileText);
+	// (void) printf("Read contents:\n");
+	// (void) printf("%s\n", fileText);
 
 	// Process using RegEx
 	if(regcomp(&matchex, \
@@ -62,36 +77,40 @@ int main (int argc, const char* argv[])
 		exit(EXIT_FAILURE);
 	}
 
+	sum = 0;
+	mCount = 0;
 	// Match regex patter on input text
 	while((regexec(&matchex, fileText, MAX_MATCH, matches, 0) == 0) \
 			&& (*fileText != '\0'))
 	{
-		(void) printf("Match found:\n %.*s\n", \
-				matches[0].rm_eo - matches[0].rm_so, \
+		(void) printf("Match found: %.*s\n", 
+				matches[0].rm_eo - matches[0].rm_so,
 				fileText + matches[0].rm_so);
+		mCount++;
 
 		// Get string of match
 		mStr = fileText + matches[0].rm_so;
+
 		// Parse string
+			// Procedure:
 			// Look for numbers
 			// pChrNum & pLength get the whole number
 			// Extract digits and turn them into numbers
+			
 			// First number
 			pChrNum = strpbrk(mStr, nums);
-			printf("%c\n", *pChrNum);
 			pLength = strspn(pChrNum, nums);
-			printf("pl %d\n", pLength);
-			printf("%.*s\n", pLength, pChrNum);
+			no1 = atoi(pChrNum); 
+			// this stops at the first non-numerical char.
+			// see glibc (strtol_l) impl. for details
 
 			// Second number
-			pChrNum = pChrNum + 2;
+			pChrNum = pChrNum + pLength;
 			pChrNum = strpbrk(pChrNum, nums);
-			printf("%c\n", *pChrNum);
-			pLength = strspn(pChrNum, nums);
-			printf("pl %d\n", pLength);
-			printf("%.*s\n", pLength, pChrNum);
-			// Multiply numbers
-		// Add multiplications together
+			no2 = atoi(pChrNum);
+			
+		// Multiply and Add numbers together
+		sum += (no1 * no2);
 
 		// Move past the match
 		fileText = fileText + matches[0].rm_eo;
@@ -101,11 +120,13 @@ int main (int argc, const char* argv[])
 			fileText++;
 	}
 
+	printf("Matches found -> %d\n", mCount);
+	printf("Sum of all mul instructions is -> %llu\n", sum);
+
 	// Free file and regex from memory
 	free(fileTextBegin);
 	fclose(inFile);
 	regfree(&matchex);
-
 
 	return EXIT_SUCCESS;
 }
